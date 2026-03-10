@@ -1,7 +1,8 @@
 package ru.yandex.practicum;
 
 import java.util.List;
-
+import java.io.PrintWriter;
+import java.util.*;
 /*
 этот класс содержит в себе список слов List<String>
     его методы похожи на методы списка, но учитывают особенности игры
@@ -10,5 +11,13 @@ import java.util.List;
 public class WordleDictionary {
 
     private List<String> words;
+    private final PrintWriter log;
+    private final Random random = new Random();
+
+    public WordleDictionary(List<String> words, PrintWriter log) {
+        this.words = new ArrayList<>(words);
+        this.log = log;
+        log.println();
+    }
 
 }
