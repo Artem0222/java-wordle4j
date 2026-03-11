@@ -15,6 +15,7 @@ public class WordleDictionaryLoader {
     private final PrintWriter log;
 
     public WordleDictionaryLoader(PrintWriter log) {
+
         this.log = log;
     }
     public WordleDictionary loadDictionay(String filename) throws DictionaryLoadException {

@@ -22,12 +22,14 @@ public class WordleGame {
 
     private String answer;
     private int remainingAttempts;
-    private int steps;
+
     private WordleDictionary dictionary;
     private PrintWriter log;
     private List<String> previousGuesses;
+    private  List<String> previousResults;
     private boolean isGameOver;
     private boolean isWon;
+    private Set<String> usedHints;
     private static final int MAX_ATTEMPTS = 6;
 
     public WordleGame (WordleDictionary dictionary, PrintWriter log) {
@@ -36,9 +38,146 @@ public class WordleGame {
         this.answer = dictionary.getRandomWord();
         this.remainingAttempts = MAX_ATTEMPTS;
         this.previousGuesses = new ArrayList<>();
+        this.previousResults = new ArrayList<>();
+        this.usedHints = new HashSet<>();
         this.isGameOver = false;
         this.isWon = false;
+
+        log.println("Игра создана. Загадано слово - " + answer);
     }
 
+    public String makeGuess(String guess) throws InvalidWordException, WordNotFoundException {
+        String normalizedGuess = WordUtils.normalize(guess);
 
+        if (!WordUtils.isValidWord(normalizedGuess)) {
+            throw new InvalidWordException("Слово должно состоять из 5 букв");
+        }
+        if (!dictionary.containsWord(normalizedGuess)) {
+            throw new WordNotFoundException("Слово '" + normalizedGuess + "' не найдено в словаре");
+        }
+        if (isGameOver) {
+            throw new IllegalStateException("Игра уже завершщена");
+        }
+        previousGuesses.add(normalizedGuess);
+
+        String result = WordleDictionary.analyzeGuess(normalizedGuess, answer);
+        previousResults.add(result);
+
+        remainingAttempts--;
+
+        if (normalizedGuess.equals(answer)) {
+            isWon = true;
+            isGameOver = true;
+        } else if (remainingAttempts == 0) {
+            isGameOver = true;
+        }
+log.println("Ход: слово='" + normalizedGuess + "', результат='" + result +
+        "', осталось попыток=" + remainingAttempts);
+        return result;
+    }
+public String getHint() {
+        if (isGameOver) {
+            return "Игра уже завершена. Загаданное слово - " + answer;
+        }
+        List<String> possibleWords = dictionary.getWordsCopy();
+
+        for (int i = 0; i < previousGuesses.size(); i++) {
+            String guess = previousGuesses.get(i);
+            String result = previousResults.get(i);
+            possibleWords = filterWordsByResult(possibleWords, guess, result);
+        }
+        possibleWords.removeAll(usedHints);
+
+        if (possibleWords.isEmpty()) {
+            String randomWord = dictionary.getRandomWord();
+            usedHints.add(randomWord);
+            return randomWord + " (случайное слово)";
+        }
+
+    // Выбираем случайное слово из подходящих
+    Random random = new Random();
+    String hint = possibleWords.get(random.nextInt(possibleWords.size()));
+    usedHints.add(hint);
+
+    log.println("Сгенерирована подсказка: " + hint + " (осталось вариантов: " + possibleWords.size() + ")");
+    return hint;
 }
+
+    private List<String> filterWordsByResult(List<String> words, String guess, String result) {
+        return words.stream()
+                .filter(word -> matchesPattern(word, guess, result))
+                .collect(Collectors.toList());
+    }
+
+    private boolean matchesPattern(String word, String guess, String result) {
+        if (word.length() != guess.length()) {
+            return false;
+        }
+
+        for (int i = 0; i < result.length(); i++) {
+            if (result.charAt(i) == '+') {
+                if (word.charAt(i) != guess.charAt(i)) {
+                    return false;
+                }
+            }
+        }
+
+
+        for (int i = 0; i < result.length(); i++) {
+            if (result.charAt(i) == '^') {
+                char c = guess.charAt(i);
+                if (word.charAt(i) == c || word.indexOf(c) == -1) {
+                    return false;
+                }
+            }
+        }
+
+        for (int i = 0; i < result.length(); i++) {
+            if (result.charAt(i) == '-') {
+                char c = guess.charAt(i);
+
+                boolean foundElsewhere = false;
+                for (int j = 0; j < result.length(); j++) {
+                    if (j != i && (result.charAt(j) == '+' || result.charAt(j) == '^') &&
+                            guess.charAt(j) == c) {
+                        foundElsewhere = true;
+                        break;
+                    }
+                }
+                if (!foundElsewhere && word.indexOf(c) != -1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public boolean isWon() {
+        return isWon;
+    }
+
+    public int getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public List<String> getPreviousGuesses() {
+        return new ArrayList<>(previousGuesses);
+    }
+
+    public List<String> getPreviousResults() {
+        return new ArrayList<>(previousResults);
+    }
+}
+        }
+}
+
+                }

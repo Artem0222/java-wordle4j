@@ -37,8 +37,12 @@ public boolean containsWord(String word) {
         return contains;
 }
 public List<String> getWords() {
+
         return new ArrayList<>(words);
 }
+    public List<String> getWordsCopy() {
+        return new ArrayList<>(words);
+    }
 public static String analyzeGuess(String guess, String answer) {
     if (guess == null || answer == null || guess.length() != answer.length()) {
         throw new IllegalArgumentException("Слова должны быть с одинаковой длинной");
