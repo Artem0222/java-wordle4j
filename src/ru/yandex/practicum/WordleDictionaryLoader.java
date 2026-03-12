@@ -26,8 +26,7 @@ public class WordleDictionaryLoader {
         log.println("Словарь: " + filename);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader
-                (new FileInputStream(filename),
-                        StandardCharsets.UTF_8)
+                (new FileInputStream(filename), StandardCharsets.UTF_8)
         )) {
             String line;
             int lineNumber = 0;
