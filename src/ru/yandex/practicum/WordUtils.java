@@ -7,19 +7,22 @@ public final class WordUtils {
     private WordUtils() {
 
     }
+
     public static String normalize(String word) {
         if (word == null) {
             return "";
         }
-        return word.toLowerCase().replace('ё','е').trim();
+        return word.toLowerCase().replace('ё', 'е').trim();
     }
-    public static  boolean isValidWord(String word) {
+
+    public static boolean isValidWord(String word) {
         if (word == null) {
             return false;
         }
         String normalized = normalize(word);
         return normalized.length() == WORD_LENGTH && normalized.matches(RUSSIAN_LETTERS_PATTERN);
     }
+
     public static int getWordLength() {
         return WORD_LENGTH;
     }
