@@ -177,7 +177,4 @@ public String getHint() {
         return new ArrayList<>(previousResults);
     }
 }
-        }
-}
 
-                }

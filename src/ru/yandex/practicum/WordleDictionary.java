@@ -62,7 +62,7 @@ public static String analyzeGuess(String guess, String answer) {
         char guessChar = guess.charAt(i);
         boolean found = false;
 
-        for (int j = 0; j < answer.length(); i++) {
+        for (int j = 0; j < answer.length(); j++) {
             if (!answerUsed[j] && answer.charAt(j) == guessChar) {
                 result[i] = '^';
                 answerUsed[j] = true;
