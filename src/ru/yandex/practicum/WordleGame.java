@@ -6,6 +6,7 @@ import ru.yandex.practicum.exceptions.WordNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 /*
 в этом классе хранится словарь и состояние игры
     текущий шаг
@@ -26,13 +27,13 @@ public class WordleGame {
     private WordleDictionary dictionary;
     private PrintWriter log;
     private List<String> previousGuesses;
-    private  List<String> previousResults;
+    private List<String> previousResults;
     private boolean isGameOver;
     private boolean isWon;
     private Set<String> usedHints;
     private static final int MAX_ATTEMPTS = 6;
 
-    public WordleGame (WordleDictionary dictionary, PrintWriter log) {
+    public WordleGame(WordleDictionary dictionary, PrintWriter log) {
         this.dictionary = dictionary;
         this.log = log;
         this.answer = dictionary.getRandomWord();
@@ -71,11 +72,12 @@ public class WordleGame {
         } else if (remainingAttempts == 0) {
             isGameOver = true;
         }
-log.println("Ход: слово='" + normalizedGuess + "', результат='" + result +
-        "', осталось попыток=" + remainingAttempts);
+        log.println("Ход: слово='" + normalizedGuess + "', результат='" + result +
+                "', осталось попыток=" + remainingAttempts);
         return result;
     }
-public String getHint() {
+
+    public String getHint() {
         if (isGameOver) {
             return "Игра уже завершена. Загаданное слово - " + answer;
         }
@@ -94,14 +96,14 @@ public String getHint() {
             return randomWord + " (случайное слово)";
         }
 
-    // Выбираем случайное слово из подходящих
-    Random random = new Random();
-    String hint = possibleWords.get(random.nextInt(possibleWords.size()));
-    usedHints.add(hint);
+        // Выбираем случайное слово из подходящих
+        Random random = new Random();
+        String hint = possibleWords.get(random.nextInt(possibleWords.size()));
+        usedHints.add(hint);
 
-    log.println("Сгенерирована подсказка: " + hint + " (осталось вариантов: " + possibleWords.size() + ")");
-    return hint;
-}
+        log.println("Сгенерирована подсказка: " + hint + " (осталось вариантов: " + possibleWords.size() + ")");
+        return hint;
+    }
 
     private List<String> filterWordsByResult(List<String> words, String guess, String result) {
         return words.stream()

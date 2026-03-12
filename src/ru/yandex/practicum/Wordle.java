@@ -18,43 +18,45 @@ import java.util.Scanner;
 public class Wordle {
 
     public static void main(String[] args) {
-PrintWriter log = null;
+        PrintWriter log = null;
 
-try {
-    log = createLogFile();
-        log.println("Запуск игры");
+        try {
+            log = createLogFile();
+            log.println("Запуск игры");
 
-        WordleDictionaryLoader loader = new WordleDictionaryLoader(log);
-        WordleDictionary dictionary = loader.loadDictionay("words_ru.txt");
+            WordleDictionaryLoader loader = new WordleDictionaryLoader(log);
+            WordleDictionary dictionary = loader.loadDictionay("words_ru.txt");
 
-        WordleGame game = new WordleGame(dictionary, log);
+            WordleGame game = new WordleGame(dictionary, log);
 
-        playGame(game, log);
-} catch (DictionaryLoadException e) {
-System.err.println("Ошибка загрузки словаря " + e.getMessage());
-if (log != null) {
-    log.println("Критическая ошибка " + e.getMessage());
-    e.printStackTrace(log);
-}
-} catch (Exception e) {
-    System.err.println("Неожиданная ошибка " + e.getMessage());
-    if (log != null) {
-        log.println("Неожиданная ошибка " + e.getMessage());
-        e.printStackTrace(log);
+            playGame(game, log);
+        } catch (DictionaryLoadException e) {
+            System.err.println("Ошибка загрузки словаря " + e.getMessage());
+            if (log != null) {
+                log.println("Критическая ошибка " + e.getMessage());
+                e.printStackTrace(log);
+            }
+        } catch (Exception e) {
+            System.err.println("Неожиданная ошибка " + e.getMessage());
+            if (log != null) {
+                log.println("Неожиданная ошибка " + e.getMessage());
+                e.printStackTrace(log);
+            }
+        } finally {
+            if (log != null) {
+                log.println("Завершение работы программы");
+                log.close();
+            }
+        }
     }
-} finally {
-    if (log != null) {
-        log.println("Завершение работы программы");
-        log.close();
-    }
-}
-    }
-private static PrintWriter createLogFile() throws IOException {
+
+    private static PrintWriter createLogFile() throws IOException {
         String logFileName = "wordle_log_" + System.currentTimeMillis() + " .txt";
         FileWriter fileWriter = new FileWriter(logFileName, StandardCharsets.UTF_8);
         return new PrintWriter(fileWriter, true);
-}
-private static void playGame(WordleGame game, PrintWriter log) {
+    }
+
+    private static void playGame(WordleGame game, PrintWriter log) {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Отгадайте слово из 5 букв за 6 попыток");
 
@@ -94,5 +96,5 @@ private static void playGame(WordleGame game, PrintWriter log) {
                 }
             }
         }
-}
+    }
 }

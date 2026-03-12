@@ -2,39 +2,41 @@ package ru.yandex.practicum;
 
 
 import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import ru.yandex.practicum.exceptions.InvalidWordException;
 import ru.yandex.practicum.exceptions.WordNotFoundException;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-    import java.util.List;
+import java.util.List;
 
 class WordleTest {
-private PrintWriter testLog;
-private WordleDictionary testDictionary;
-private WordleGame game;
+    private PrintWriter testLog;
+    private WordleDictionary testDictionary;
+    private WordleGame game;
 
-@BeforeEach
+    @BeforeEach
     void setUp() {
-    testLog = new PrintWriter(System.out, true);
+        testLog = new PrintWriter(System.out, true);
 
-    List<String> words = Arrays.asList("герой", "кошка");
-    testDictionary = new WordleDictionary(words, testLog);
-}
+        List<String> words = Arrays.asList("герой", "кошка");
+        testDictionary = new WordleDictionary(words, testLog);
+    }
 
-@Test
-void testNormalize() {
+    @Test
+    void testNormalize() {
 
-    assertEquals("герой", WordUtils.normalize("ГЕРОЙ"));
+        assertEquals("герой", WordUtils.normalize("ГЕРОЙ"));
 
-    assertEquals("ежик", WordUtils.normalize("Ёжик"));
+        assertEquals("ежик", WordUtils.normalize("Ёжик"));
 
-    assertEquals("кот", WordUtils.normalize(" кот "));
+        assertEquals("кот", WordUtils.normalize(" кот "));
 
-    assertEquals("", WordUtils.normalize(null));
-}
+        assertEquals("", WordUtils.normalize(null));
+    }
 
     @Test
     void testIsValidWord() {
