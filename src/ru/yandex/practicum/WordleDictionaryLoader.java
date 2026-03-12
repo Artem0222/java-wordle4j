@@ -25,9 +25,16 @@ public class WordleDictionaryLoader {
 
         log.println("Словарь: " + filename);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader
-                (new FileInputStream(filename), StandardCharsets.UTF_8)
-        )) {
+
+        FileInputStream fileInputStream = null;
+        InputStreamReader inputStreamReader = null;
+        BufferedReader reader = null;
+
+        try {
+            fileInputStream = new FileInputStream(filename);
+            inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+            reader = new BufferedReader(inputStreamReader);
+
             String line;
             int lineNumber = 0;
             int skippedLines = 0;
@@ -44,19 +51,38 @@ public class WordleDictionaryLoader {
                             "подходит для игры)");
                 }
             }
+
             if (validWords.isEmpty()) {
                 throw new DictionaryLoadException("Словарь не содержит подходящих слов (5 букв)");
             }
+
             log.println("Загружено слов: " + validWords.size() + ", пропущено строк: " +
                     skippedLines);
             return new WordleDictionary(validWords, log);
+
         } catch (FileNotFoundException e) {
             log.println("Ошибка. Файл словаря не найден: " + filename);
             throw new DictionaryLoadException("Ошибка. Файл словаря не найден: " + filename, e);
         } catch (IOException e) {
             log.println("Ошибка ввода-вывода при чтении файла: " + e.getMessage());
             throw new DictionaryLoadException("Ошибка при чтении файла словаря " + filename, e);
+        } finally {
+
+            try {
+                if (reader != null) reader.close();
+            } catch (IOException e) {
+                log.println("Ошибка при закрытии reader: " + e.getMessage());
+            }
+            try {
+                if (inputStreamReader != null) inputStreamReader.close();
+            } catch (IOException e) {
+                log.println("Ошибка при закрытии inputStreamReader: " + e.getMessage());
+            }
+            try {
+                if (fileInputStream != null) fileInputStream.close();
+            } catch (IOException e) {
+                log.println("Ошибка при закрытии fileInputStream: " + e.getMessage());
+            }
         }
     }
-}
 
