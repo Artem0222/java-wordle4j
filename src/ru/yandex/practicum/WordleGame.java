@@ -51,6 +51,22 @@ public class WordleGame {
         log.println("Игра создана. Загадано слово - " + answer);
     }
 
+    public WordleGame(WordleDictionary dictionary, PrintWriter log, String forcedAnswer) {
+        this.dictionary = dictionary;
+        this.log = log;
+        this.answer = forcedAnswer;  // Используем переданное слово
+        this.remainingAttempts = MAX_ATTEMPTS;
+        this.previousGuesses = new ArrayList<>();
+        this.previousResults = new ArrayList<>();
+        this.usedHints = new HashSet<>();
+        this.isGameOver = false;
+        this.isWon = false;
+        this.remainingHints = MAX_HINTS;
+
+        log.println("Игра создана с заданным ответом. Загадано слово - " + answer);
+        log.println("Максимум подсказок: " + MAX_HINTS);
+    }
+
     public String makeGuess(String guess) throws InvalidWordException, WordNotFoundException {
         String normalizedGuess = WordUtils.normalize(guess);
 

@@ -1,19 +1,17 @@
 package ru.yandex.practicum;
 
-
 import org.junit.jupiter.api.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import ru.yandex.practicum.exceptions.InvalidWordException;
 import ru.yandex.practicum.exceptions.WordNotFoundException;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class WordleTest {
+
     private PrintWriter testLog;
     private WordleDictionary testDictionary;
     private WordleGame game;
@@ -21,49 +19,36 @@ class WordleTest {
     @BeforeEach
     void setUp() {
         testLog = new PrintWriter(System.out, true);
-
         List<String> words = Arrays.asList("герой", "кошка");
         testDictionary = new WordleDictionary(words, testLog);
     }
 
     @Test
     void testNormalize() {
-
         assertEquals("герой", WordUtils.normalize("ГЕРОЙ"));
-
         assertEquals("ежик", WordUtils.normalize("Ёжик"));
-
         assertEquals("кот", WordUtils.normalize(" кот "));
-
         assertEquals("", WordUtils.normalize(null));
     }
 
     @Test
     void testIsValidWord() {
-
         assertTrue(WordUtils.isValidWord("герой"));
-
         assertFalse(WordUtils.isValidWord("дом"));
-
         assertFalse(WordUtils.isValidWord("квартира"));
-
         assertFalse(WordUtils.isValidWord("hello"));
     }
 
     @Test
     void testAnalyzeGuess() {
-
         assertEquals("+++++", WordleDictionary.analyzeGuess("герой", "герой"));
-
         assertEquals("+^-^-", WordleDictionary.analyzeGuess("гонец", "герой"));
-
         assertEquals("-----", WordleDictionary.analyzeGuess("абвгд", "клмнп"));
     }
 
     @Test
     void testGameCreation() {
         game = new WordleGame(testDictionary, testLog);
-
         assertNotNull(game.getAnswer());
         assertEquals(6, game.getRemainingAttempts());
         assertFalse(game.isGameOver());
@@ -72,26 +57,22 @@ class WordleTest {
 
     @Test
     void testSuccessfulGuess() throws InvalidWordException, WordNotFoundException {
-        // Создаем игру только с одним словом
-        WordleDictionary dict = new WordleDictionary(List.of("герой"), testLog);
-        game = new WordleGame(dict, testLog);
+        game = new WordleGame(testDictionary, testLog, "герой");
 
         String result = game.makeGuess("герой");
 
         assertEquals("+++++", result);
         assertTrue(game.isWon());
         assertTrue(game.isGameOver());
-        assertEquals(5, game.getRemainingAttempts()); // Было 6, стало 5
+        assertEquals(5, game.getRemainingAttempts());
     }
 
     @Test
     void testWrongGuess() throws InvalidWordException, WordNotFoundException {
-        WordleDictionary dict = new WordleDictionary(List.of("герой", "кошка"), testLog);
-        game = new WordleGame(dict, testLog);
-        if (game.getAnswer().equals("кошка")) {
-            game = new WordleGame(dict, testLog);
-        }
+        game = new WordleGame(testDictionary, testLog, "герой");
+
         String result = game.makeGuess("кошка");
+
         assertNotEquals("+++++", result);
         assertFalse(game.isWon());
         assertFalse(game.isGameOver());
@@ -100,19 +81,16 @@ class WordleTest {
 
     @Test
     void testGameOverAfterSixAttempts() throws InvalidWordException, WordNotFoundException {
-        game = new WordleGame(testDictionary, testLog);
-
+        game = new WordleGame(testDictionary, testLog, "герой");
 
         for (int i = 0; i < 6; i++) {
-            if (i < 5) {
+            game.makeGuess("кошка");
 
-                game.makeGuess("кошка");
-                assertFalse(game.isGameOver());
+            if (i < 5) {
+                assertFalse(game.isGameOver(), "Игра должна продолжаться после " + (i + 1) + " попытки");
             } else {
-                // 6-я попытка
-                game.makeGuess("кошка");
-                assertTrue(game.isGameOver());
-                assertFalse(game.isWon());
+                assertTrue(game.isGameOver(), "Игра должна окончиться после 6 попыток");
+                assertFalse(game.isWon(), "Игрок не должен победить");
             }
         }
 
@@ -121,7 +99,7 @@ class WordleTest {
 
     @Test
     void testInvalidWordException() {
-        game = new WordleGame(testDictionary, testLog);
+        game = new WordleGame(testDictionary, testLog, "герой");
 
         assertThrows(InvalidWordException.class, () -> {
             game.makeGuess("дом");
@@ -134,7 +112,7 @@ class WordleTest {
 
     @Test
     void testWordNotFoundException() {
-        game = new WordleGame(testDictionary, testLog);
+        game = new WordleGame(testDictionary, testLog, "герой");
 
         assertThrows(WordNotFoundException.class, () -> {
             game.makeGuess("арбуз");
@@ -142,23 +120,20 @@ class WordleTest {
     }
 
     @Test
-    void testGetHint() throws InvalidWordException, WordNotFoundException {
-        game = new WordleGame(testDictionary, testLog);
-
-
-        String hint = game.getHint();
-        assertNotNull(hint);
-
-        String hintWord = hint.contains(" ") ? hint.split(" ")[0] : hint;
-        assertTrue(testDictionary.containsWord(hintWord) || hintWord.length() == 5);
-    }
-
-    @Test
     void testContainsWord() {
-
         assertTrue(testDictionary.containsWord("герой"));
         assertTrue(testDictionary.containsWord("ГЕРОЙ"));
         assertFalse(testDictionary.containsWord("арбуз"));
     }
-}
 
+    @Test
+    void testGetHint() throws InvalidWordException, WordNotFoundException {
+        game = new WordleGame(testDictionary, testLog, "герой");
+
+        assertEquals(3, game.getRemainingHints());
+
+        String hint = game.getHint();
+        assertNotNull(hint);
+        assertEquals(2, game.getRemainingHints());
+    }
+}
