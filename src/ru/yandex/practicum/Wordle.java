@@ -72,36 +72,37 @@ public class Wordle {
                     System.out.println("Игра остановлена");
                     log.println("Пользователь прервал игру командой: " + input);
                     break;
-
-                    try {
-                        if (input.isEmpty()) {
-                            String hint = game.getHint();
-                            System.out.println("Подсказка - " + hint);
-                            log.println("Игрок запросил подсказку " + hint);
-                            continue;
-                        }
-                        String result = game.makeGuess(input);
-
-                        System.out.println("Результат " + result);
-                        System.out.println("осталось попыток " + game.getRemainingAttempts());
-
-                        if (game.isWon()) {
-                            System.out.println("Поздравляем. Вы отгадали слово " + game.getAnswer());
-                            log.println("Пользователь победил. Загаданное слово - " + game.getAnswer());
-                            break;
-                        } else if (game.isGameOver()) {
-                            System.out.println("Игра окончена. Загаданное слово " + game.getAnswer());
-                            log.println("Пользователь проиграл. Загаданное слово - " + game.getAnswer());
-                            break;
-                        }
-                    } catch (ru.yandex.practicum.exceptions.InvalidWordException e) {
-                        System.out.println("Ошибка: " + e.getMessage());
-                        log.println("Игрок ввел некорректное слово: " + input);
-                    } catch (ru.yandex.practicum.exceptions.WordNotFoundException e) {
-                        System.out.println("Ошибка: " + e.getMessage());
-                        log.println("Пользователь ввёл слово, которого нет в словаре - " + input);
+                }
+                try {
+                    if (input.isEmpty()) {
+                        String hint = game.getHint();
+                        System.out.println("Подсказка - " + hint);
+                        log.println("Игрок запросил подсказку " + hint);
+                        continue;
                     }
+                    String result = game.makeGuess(input);
+
+                    System.out.println("Результат " + result);
+                    System.out.println("осталось попыток " + game.getRemainingAttempts());
+
+                    if (game.isWon()) {
+                        System.out.println("Поздравляем. Вы отгадали слово " + game.getAnswer());
+                        log.println("Пользователь победил. Загаданное слово - " + game.getAnswer());
+                        break;
+                    } else if (game.isGameOver()) {
+                        System.out.println("Игра окончена. Загаданное слово " + game.getAnswer());
+                        log.println("Пользователь проиграл. Загаданное слово - " + game.getAnswer());
+                        break;
+                    }
+                } catch (ru.yandex.practicum.exceptions.InvalidWordException e) {
+                    System.out.println("Ошибка: " + e.getMessage());
+                    log.println("Игрок ввел некорректное слово: " + input);
+                } catch (ru.yandex.practicum.exceptions.WordNotFoundException e) {
+                    System.out.println("Ошибка: " + e.getMessage());
+                    log.println("Пользователь ввёл слово, которого нет в словаре - " + input);
                 }
             }
         }
     }
+}
+
