@@ -86,10 +86,12 @@ class WordleTest {
 
     @Test
     void testWrongGuess() throws InvalidWordException, WordNotFoundException {
-        game = new WordleGame(testDictionary, testLog);
-
+        WordleDictionary dict = new WordleDictionary(List.of("герой", "кошка"), testLog);
+        game = new WordleGame(dict, testLog);
+        if (game.getAnswer().equals("кошка")) {
+            game = new WordleGame(dict, testLog);
+        }
         String result = game.makeGuess("кошка");
-
         assertNotEquals("+++++", result);
         assertFalse(game.isWon());
         assertFalse(game.isGameOver());
