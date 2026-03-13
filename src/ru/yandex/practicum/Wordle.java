@@ -59,42 +59,49 @@ public class Wordle {
     private static void playGame(WordleGame game, PrintWriter log) {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Отгадайте слово из 5 букв за 6 попыток");
-
+            System.out.println("Команды:");
+            System.out.println("  Enter - подсказка (осталось: " + game.getRemainingHints() + ")");
+            System.out.println("  'стоп' - выйти из игры");
             log.println("Начало серии");
 
             while (!game.isGameOver()) {
                 System.out.println("Введите слово");
                 String input = scanner.nextLine().trim();
 
-                try {
-                    if (input.isEmpty()) {
-                        String hint = game.getHint();
-                        System.out.println("Подсказка - " + hint);
-                        log.println("Игрок запросил подсказку " + hint);
-                        continue;
-                    }
-                    String result = game.makeGuess(input);
+                if (game.isExitCommand(input)) {
+                    System.out.println("Игра остановлена");
+                    log.println("Пользователь прервал игру командой: " + input);
+                    break;
 
-                    System.out.println("Результат " + result);
-                    System.out.println("осталось попыток " + game.getRemainingAttempts());
+                    try {
+                        if (input.isEmpty()) {
+                            String hint = game.getHint();
+                            System.out.println("Подсказка - " + hint);
+                            log.println("Игрок запросил подсказку " + hint);
+                            continue;
+                        }
+                        String result = game.makeGuess(input);
 
-                    if (game.isWon()) {
-                        System.out.println("Поздравляем. Вы отгадали слово " + game.getAnswer());
-                        log.println("Пользователь победил. Загаданное слово - " + game.getAnswer());
-                        break;
-                    } else if (game.isGameOver()) {
-                        System.out.println("Игра окончена. Загаданное слово " + game.getAnswer());
-                        log.println("Пользователь проиграл. Загаданное слово - " + game.getAnswer());
-                        break;
+                        System.out.println("Результат " + result);
+                        System.out.println("осталось попыток " + game.getRemainingAttempts());
+
+                        if (game.isWon()) {
+                            System.out.println("Поздравляем. Вы отгадали слово " + game.getAnswer());
+                            log.println("Пользователь победил. Загаданное слово - " + game.getAnswer());
+                            break;
+                        } else if (game.isGameOver()) {
+                            System.out.println("Игра окончена. Загаданное слово " + game.getAnswer());
+                            log.println("Пользователь проиграл. Загаданное слово - " + game.getAnswer());
+                            break;
+                        }
+                    } catch (ru.yandex.practicum.exceptions.InvalidWordException e) {
+                        System.out.println("Ошибка: " + e.getMessage());
+                        log.println("Игрок ввел некорректное слово: " + input);
+                    } catch (ru.yandex.practicum.exceptions.WordNotFoundException e) {
+                        System.out.println("Ошибка: " + e.getMessage());
+                        log.println("Пользователь ввёл слово, которого нет в словаре - " + input);
                     }
-                } catch (ru.yandex.practicum.exceptions.InvalidWordException e) {
-                    System.out.println("Ошибка: " + e.getMessage());
-                    log.println("Игрок ввел некорректное слово: " + input);
-                } catch (ru.yandex.practicum.exceptions.WordNotFoundException e) {
-                    System.out.println("Ошибка: " + e.getMessage());
-                    log.println("Пользователь ввёл слово, которого нет в словаре - " + input);
                 }
             }
         }
     }
-}

@@ -33,6 +33,9 @@ public class WordleGame {
     private Set<String> usedHints;
     private static final int MAX_ATTEMPTS = 6;
 
+    private int remainingHints;
+    private static final int MAX_HINTS = 3;
+
     public WordleGame(WordleDictionary dictionary, PrintWriter log) {
         this.dictionary = dictionary;
         this.log = log;
@@ -43,6 +46,7 @@ public class WordleGame {
         this.usedHints = new HashSet<>();
         this.isGameOver = false;
         this.isWon = false;
+        this.remainingHints = MAX_HINTS;
 
         log.println("Игра создана. Загадано слово - " + answer);
     }
@@ -81,28 +85,52 @@ public class WordleGame {
         if (isGameOver) {
             return "Игра уже завершена. Загаданное слово - " + answer;
         }
-        List<String> possibleWords = dictionary.getWordsCopy();
+
+
+        if (remainingHints <= 0) {
+            return "больше нет подсказок!";
+        }
+
+        List<String> possibleWords = dictionary.getWords();
+
 
         for (int i = 0; i < previousGuesses.size(); i++) {
             String guess = previousGuesses.get(i);
             String result = previousResults.get(i);
             possibleWords = filterWordsByResult(possibleWords, guess, result);
         }
+
+
         possibleWords.removeAll(usedHints);
 
+        String hint;
         if (possibleWords.isEmpty()) {
-            String randomWord = dictionary.getRandomWord();
-            usedHints.add(randomWord);
-            return randomWord + " (случайное слово)";
+            hint = dictionary.getRandomWord();
+        } else {
+            Random random = new Random();
+            hint = possibleWords.get(random.nextInt(possibleWords.size()));
         }
 
-        // Выбираем случайное слово из подходящих
-        Random random = new Random();
-        String hint = possibleWords.get(random.nextInt(possibleWords.size()));
+
+        remainingHints--;
         usedHints.add(hint);
 
-        log.println("Сгенерирована подсказка: " + hint + " (осталось вариантов: " + possibleWords.size() + ")");
-        return hint;
+        log.println("Сгенерирована подсказка: " + hint +
+                " (осталось подсказок: " + remainingHints +
+                ", вариантов: " + possibleWords.size() + ")");
+
+        return hint + " (осталось подсказок: " + remainingHints + ")";
+    }
+
+
+    public boolean isExitCommand(String input) {
+        String normalized = WordUtils.normalize(input);
+        return normalized.equals("стоп");
+    }
+
+
+    public int getRemainingHints() {
+        return remainingHints;
     }
 
     private List<String> filterWordsByResult(List<String> words, String guess, String result) {
